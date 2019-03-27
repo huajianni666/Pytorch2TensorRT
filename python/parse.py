@@ -672,15 +672,12 @@ class PytorchParser:
         for node in graph.outputs():
             index = node.uniqueName()
             assert type(data[index]) == trt.ITensor, "output tensor is not a trt.ITensor"
-            trt_network.mark_output(data[index])
             onnx_output_idx.append(index)
 
         inputs = [data[onnx_output_idx[0]], inputTensors[1]]
         prior_data  = self.pluginOp["FinetuneLocF"](trt_network, inputs, outputs, params)
-        trt_network.mark_output(prior_data)
         inputs = [data[onnx_output_idx[1]], data[onnx_output_idx[3]]]
         outputsConf = self.pluginOp["FilterBgConfF"](trt_network, inputs, outputs, params)
-        trt_network.mark_output(outputsConf)
         params = [Vehicle['NUM_CLASSES'],Vehicle['BG_LABEL'],Vehicle['TOP_K'],Vehicle['CONF_THRESH'],Vehicle['NMS_THRESH']]
         inputs = [data[onnx_output_idx[2]], outputsConf, prior_data]
         result = self.pluginOp["DetectF"](trt_network, inputs, outputs, params)

@@ -54,14 +54,9 @@ def do_inference(context, bindings, inputs, outputs, stream):
     context.execute_async(bindings=bindings, stream_handle=stream.handle)
     firstendtime = time.time()
     print('first inference time: {} MS'.format((firstendtime-firsttime)*1000))
-    starttime = time.time()
-    for i in range(1000):
-        context.execute_async(bindings=bindings, stream_handle=stream.handle)
     # Transfer predictions back from the GPU.
     [cuda.memcpy_dtoh_async(out.host, out.device, stream) for out in outputs]
     # Synchronize the stream
     stream.synchronize()
-    endtime = time.time()
-    print('normal inference time: {} MS'.format((endtime-starttime)))
     # Return only the host outputs.
     return [out.host for out in outputs]

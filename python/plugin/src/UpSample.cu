@@ -1,5 +1,5 @@
 #include "UpSample.h"
-#include "common.h"
+#include "Common.h"
 
 template <typename T>
 __global__ void KernelResizeNearest(const T* in_data, int count, int channel,

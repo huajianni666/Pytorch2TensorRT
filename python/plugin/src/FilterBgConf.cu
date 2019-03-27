@@ -1,5 +1,5 @@
 #include "FilterBgConf.h"
-#include "common.h"
+#include "Common.h"
 
 __global__ void KernelFilterBgConf(int batchSize, int numPriorboxes, int numClasses, float objectness_score, const float *arm_conf, const float *odm_conf, float *conf)
 {

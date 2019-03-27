@@ -7,7 +7,7 @@
 #include <cudnn.h>
 #include <cublas_v2.h>
 #include <stdexcept>
-#include "common.h"
+#include "Common.h"
 #include "NvInfer.h"
 #include "NvCaffeParser.h"
 #include <vector>
@@ -91,44 +91,6 @@ public:
 
 private:
         int numPriorboxes;
-};
-
-class FinetuneLocPluginFactory : public nvcaffeparser1::IPluginFactoryExt, public nvinfer1::IPluginFactory
-{
-public:
-
-	bool isPlugin(const char* name) override { return isPluginExt(name); }
-
-	bool isPluginExt(const char* name) override { return !strcmp(name, "FinetuneLocOp");; }
-
-        // Create a plugin using provided weights.
-	virtual nvinfer1::IPlugin* createPlugin(const char* layerName, const nvinfer1::Weights* weights, int nbWeights) override
-	{       
-            assert(isPluginExt(layerName));
-	    assert(mPlugin == nullptr);
-            // This plugin will need to be manually destroyed after parsing the network, by calling destroyPlugin.
-	    mPlugin = new FinetuneLocPlugin();
-            return mPlugin;
-	}
-
-        // Create a plugin from serialized data.
-	virtual nvinfer1::IPlugin* createPlugin(const char* layerName, const void* serialData, size_t serialLength) override
-	{
-            assert(isPlugin(layerName));
-            // This will be automatically destroyed when the engine is destroyed.
-	    return new FinetuneLocPlugin(serialData, serialLength);
-	}
-
-        // User application destroys plugin when it is safe to do so.
-        // Should be done after consumers of plugin (like ICudaEngine) are destroyed.
-	void destroyPlugin() 
-        {
-            delete mPlugin;   
-        }
-
-
-        FinetuneLocPlugin* mPlugin{ nullptr };     
-
 };
 
 #endif

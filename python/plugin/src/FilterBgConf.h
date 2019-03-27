@@ -7,7 +7,7 @@
 #include <cudnn.h>
 #include <cublas_v2.h>
 #include <stdexcept>
-#include "common.h"
+#include "Common.h"
 #include "NvInfer.h"
 #include "NvCaffeParser.h"
 #include <vector>
@@ -102,42 +102,6 @@ private:
         float numClasses;
         float numPriorboxes;
 
-};
-
-class FilterBgConfPluginFactory : public nvcaffeparser1::IPluginFactoryExt, public nvinfer1::IPluginFactory
-{
-public:
-
-	bool isPlugin(const char* name) override { return isPluginExt(name); }
-
-	bool isPluginExt(const char* name) override { return !strcmp(name, "FilterBgConf"); }
-
-        // Create a plugin using provided weights.
-	virtual nvinfer1::IPlugin* createPlugin(const char* layerName, const nvinfer1::Weights* weights, int nbWeights) override
-	{       
-            assert(isPluginExt(layerName));
-	    assert(mPlugin == nullptr);
-            // This plugin will need to be manually destroyed after parsing the network, by calling destroyPlugin.
-	    mPlugin = new FilterBgConfPlugin(0.1);
-            return mPlugin;
-	}
-
-        // Create a plugin from serialized data.
-	virtual nvinfer1::IPlugin* createPlugin(const char* layerName, const void* serialData, size_t serialLength) override
-	{
-            assert(isPlugin(layerName));
-            // This will be automatically destroyed when the engine is destroyed.
-	    return new FilterBgConfPlugin(serialData, serialLength);
-	}
-
-        // User application destroys plugin when it is safe to do so.
-        // Should be done after consumers of plugin (like ICudaEngine) are destroyed.
-	void destroyPlugin() 
-        {
-            delete mPlugin;   
-        }
-        
-        FilterBgConfPlugin* mPlugin{ nullptr };     
 };
 
 #endif

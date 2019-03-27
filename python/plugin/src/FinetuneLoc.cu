@@ -1,5 +1,5 @@
 #include "FinetuneLoc.h"
-#include "common.h"
+#include "Common.h"
 
 __global__ void KernelFinetuneLoc(int batchSize, int numPriorboxes, const float *arm_loc, const float *priorbox_loc, float *loc)
 {
@@ -12,6 +12,12 @@ __global__ void KernelFinetuneLoc(int batchSize, int numPriorboxes, const float 
     float var4 = 0.2;
     if (box_id < batchSize * numPriorboxes)
     {   
+        /*
+        float xmin = priorbox_loc[box_id_image * 4],
+              ymin = priorbox_loc[box_id_image * 4 + 1],
+              xmax = priorbox_loc[box_id_image * 4 + 2],
+              ymax = priorbox_loc[box_id_image * 4 + 3];
+        */
         float bbox1 = arm_loc[box_id * 4],
               bbox2 = arm_loc[box_id * 4 + 1],
               bbox3 = arm_loc[box_id * 4 + 2],

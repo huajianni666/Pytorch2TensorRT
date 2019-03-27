@@ -2,7 +2,6 @@ import sys
 import tensorrt as trt
 sys.path.insert(0, 'plugin/build/')
 from plugin import *
-from plugin import FCPlugin
 import pdb
 class PriorboxOp:
     def __call__(self, network, inputs, outputs, params):
@@ -27,6 +26,7 @@ class PriorboxOp:
         plugin = PriorBoxPlugin(minSize, maxSize, aspectRatios, len(minSize), len(maxSize), len(aspectRatios),
                                          flip, clip, variance, 0, 0, step, step, offset)
         layer = network.add_plugin([feature, data], plugin)
+        layer.name = 'priorbox'
         #print("priorbox: ", layer.get_output(0).shape, feature.shape, data.shape, minSize)
         #print(minSize, maxSize, aspectRatios, len(minSize), len(maxSize), len(aspectRatios), flip, clip, variance, 0, 0,
         #      step, step, offset)
@@ -48,24 +48,24 @@ class DetecOp:
         conf = shuffle2.get_output(0)
         shuffle3 = network.add_shuffle(prior)
         shuffle3.reshape_dims = [1, -1, 2]
-        #prior_tmp  = shuffle3.get_output(0)
-        #shuffle4 = network.add_shuffle(prior_tmp)
-        #shuffle4.first_transpose = trt.Permutation([0,2,1])
         prior  = shuffle3.get_output(0)
-        print(loc.shape, conf.shape, prior.shape)
         plugin = DetectionOutputPlugin(shareLocation, varianceEncodedInTarget, backgroundLabelId, num_classes,
                                                 top_k, keepTopK, conf_thresh, nms_thresh)
 
         layer = network.add_plugin([loc, conf, prior], plugin)
-
+        layer.name = 'detectionoutput'
         return layer.get_output(0)
 
+upsamplename = 1
 class UpsampleOp:
     def __call__(self, network, inputs, outputs, params):
         assert len(inputs) == 1
         assert type(inputs[0]) == trt.ITensor
         plugin = UpSamplePlugin(2.0, 0)
         layer = network.add_plugin_ext(inputs, plugin)
+        global upsamplename
+        layer.name = 'upsample'+ str(upsamplename)
+        upsamplename += 1
         return layer.get_output(0)
 
 class FilterBgConfOp:
@@ -74,6 +74,7 @@ class FilterBgConfOp:
         assert type(inputs[0]) == trt.ITensor and type(inputs[1]) == trt.ITensor
         plugin = FilterBgConfPlugin(0.01)
         layer = network.add_plugin_ext(inputs, plugin)
+        layer.name = 'filterbgconf'
         return layer.get_output(0)
 
 class FinetuneLocOp:
@@ -82,6 +83,7 @@ class FinetuneLocOp:
         assert type(inputs[0]) == trt.ITensor and type(inputs[1]) == trt.ITensor
         plugin = FinetuneLocPlugin()
         layer = network.add_plugin_ext(inputs, plugin)
+        layer.name = 'finetuneloc'
         return layer.get_output(0)
 
 pluginOp = {"PriorBoxF":       PriorboxOp(),

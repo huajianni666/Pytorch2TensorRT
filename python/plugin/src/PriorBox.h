@@ -2,6 +2,7 @@
 #define _PRIORBOX_H_
 #include "NvInfer.h"
 #include "NvInferPlugin.h"
+
 nvinfer1::IPlugin *PriorBoxPlugin(int numMinSize,
                                           int numMaxSize,
                                           int numAspectRatios,
