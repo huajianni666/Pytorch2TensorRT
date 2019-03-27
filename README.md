@@ -1,11 +1,21 @@
 # Atlab SDK TEAM Inference LIB
+### 运行环境
+参考Dockerfile
+
+### 安装
+```Shell
+git clone --recursive https://github.com/huajianni666/Pytorch2TensorRT.git && cd Pytorch2TensorRT
+wget http://p3gvzhggv.bkt.clouddn.com/Pytorch2Trt3rdparty.zip
+unzip Pytorch2Trt3rdparty.zip && rm Pytorch2Trt3rdparty.zip
+```
 ### 编绎
 ```Shell
-mkdir build & cd build
-cmake -DCMAKE_PREFIX_PATH="3rdparty/libtorch" ..
+cd python/plugin && mkdir build && cd build && cmake ..
 make
-python ../modules/classification/resnet18_torchscript.py 
-./resnet18_test ../scriptmodule/resnet-18-model.pt
+cd ../../
 ```
-### 安装
-1. [http://p3gvzhggv.bkt.clouddn.com/Pytorch2Trt3rdparty.zip](#第三方库)
+### 运行
+```Shell
+python refinedet.py
+
+```
