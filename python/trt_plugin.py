@@ -61,7 +61,7 @@ class UpsampleOp:
     def __call__(self, network, inputs, outputs, params):
         assert len(inputs) == 1
         assert type(inputs[0]) == trt.ITensor
-        plugin = UpSamplePlugin(2.0, 0)
+        plugin = UpSamplePlugin(2.0, 1)
         layer = network.add_plugin_ext(inputs, plugin)
         global upsamplename
         layer.name = 'upsample'+ str(upsamplename)

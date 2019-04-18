@@ -45,7 +45,7 @@ def draw(origimg, rectangles, boxNums):
                 cv2.rectangle(draw,(int(rectangles[i*7+3]*W),int(rectangles[i*7+4]*H)),(int(rectangles[i*7+5]*W),int(rectangles[i*7+6]*H)),(0,255,0),2)
     cv2.imwrite('result.jpg', draw)
 
-def pre_process(img, resize_wh=[512, 512], rgb_means=[104,117,123], swap=(2, 0, 1)):
+def pre_process(img, resize_wh=[512, 512], rgb_means=[104,117,123], rgb_scale = 0.017, swap=(2, 0, 1)):
     interp_methods = [
         cv2.INTER_LINEAR, cv2.INTER_CUBIC, cv2.INTER_AREA,
         cv2.INTER_NEAREST, cv2.INTER_LANCZOS4
@@ -56,23 +56,34 @@ def pre_process(img, resize_wh=[512, 512], rgb_means=[104,117,123], swap=(2, 0, 
         np.array(img), (resize_wh[0], resize_wh[1]),
         interpolation=interp_method).astype(np.float32)
     img -= rgb_means
+    img *= rgb_scale
     img = img.transpose(swap)
     return img, img_info
 
 if __name__ == '__main__':
-    net = Refinedet(Vehicle,RefineResnet18('320'))
-    checkpoint = torch.load("../modules/detection/refinedet_pytorch_dist/weights/refine_res_epoch_205_300.pth")
-    model = checkpoint['model']
-    load_keys = sorted(list(model.keys()))
+    net = Refinedet(Vehicle,RefineResnet18('448'))
+    checkpoint = torch.load("../modules/detection/refinedet_pytorch_dist/weights/refine_res_epoch_250_300.pth")
+    load_state_dict = checkpoint['model']
+    load_keys = sorted(list(load_state_dict.keys()))
     #print('load: {}'.format(load_keys))
+    from collections import OrderedDict
+    new_state_dict = OrderedDict()
+    for k, v in load_state_dict.items():
+        head = k[:7]
+        if head == 'module.':
+            name = k[7:]  # remove `module.`
+        else:
+            name = k
+        new_state_dict[name] = v
+
     net_state_dict = net.state_dict()
     net_keys = sorted(list(net_state_dict.keys()))
     #print('net: {}'.format(net_keys))
-    net.load_state_dict(model)
+    net.load_state_dict(new_state_dict, False)
     net.eval()
     trt_engine_datatype=trt.DataType.FLOAT  #
     img = cv2.imread('test.jpg')
-    img_resize, img_info = pre_process(img, [320,320])    
+    img_resize, img_info = pre_process(img, [448,448])    
     batch_size = 1
     imgs = []
     imgs.append(img_resize)
@@ -115,5 +126,4 @@ if __name__ == '__main__':
         save_engine(engine, "refinedet.engine")
         trt_outputs = inference(trt_network, engine, inputs)
         trt_outputs = trt_outputs[0].host
-        pdb.set_trace()
         draw(img,trt_outputs,int(trt_outputs.shape[0]/7))
