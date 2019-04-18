@@ -1,3 +1,0 @@
-[submodule "modules/detection/refinedet_pytorch_dist"]
-	path = modules/detection/refinedet_pytorch_dist
-	url = https://github.com/huajianni666/refinedet_pytorch_dist.git
