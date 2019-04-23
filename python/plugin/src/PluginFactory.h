@@ -15,6 +15,7 @@
 #include "NvInferPlugin.h"
 #include "NvInfer.h"
 #include "NvCaffeParser.h"
+#include <string>
 
 class GlobalPluginFactory : public nvcaffeparser1::IPluginFactoryExt, public nvinfer1::IPluginFactory
 {
@@ -22,8 +23,9 @@ public:
         bool isPlugin(const char* name) override { return isPluginExt(name); }
 
         bool isPluginExt(const char* name) override 
-        { 
-            return !strcmp(name, "fc") || !strcmp(name, "detectionoutput") || !strcmp(name, "filterbgconf") || !strcmp(name, "finetuneloc") || !strcmp(name, "upsample1") || !strcmp(name, "upsample2") || !strcmp(name, "upsample3"); 
+        {
+            bool UpSamplePlugin = (strstr(name,"upsample") == NULL); 
+            return !strcmp(name, "fc") || !strcmp(name, "detectionoutput") || !strcmp(name, "filterbgconf") || !strcmp(name, "finetuneloc") || !UpSamplePlugin; 
         }
 
         // Create a plugin using provided weights.
@@ -51,19 +53,7 @@ public:
                 finetuneLocPlugin = new FinetuneLocPlugin{serialData, serialLength};
                 return finetuneLocPlugin;
             }
-            else if(!strcmp(layerName, "upsample1"))
-            {
-                UpSamplePlugin* ptr = new UpSamplePlugin{serialData, serialLength};
-                upSamplePlugin.push_back(ptr);
-                return ptr;
-            }
-            else if(!strcmp(layerName, "upsample2"))
-            {
-                UpSamplePlugin* ptr = new UpSamplePlugin{serialData, serialLength};
-                upSamplePlugin.push_back(ptr);
-                return ptr;
-            }
-            else if(!strcmp(layerName, "upsample3"))
+            else if(strstr(layerName, "upsample") != NULL)
             {
                 UpSamplePlugin* ptr = new UpSamplePlugin{serialData, serialLength};
                 upSamplePlugin.push_back(ptr);

@@ -652,11 +652,11 @@ class PytorchParser:
             outputs = [(i.uniqueName(), i.type().sizes() if i.type().kind() == 'TensorType' else []) for i in node.outputs()]
             try:
                 if layerType in self.funcs.keys():
-                    print('normal op: {},{}'.format(index,layerType))
+                    print('normal op: {},{}'.format(outputs[0][0],layerType))
                     params = {k : node[k] for k in node.attributeNames()}
                     results = self.funcs[layerType](trt_network, inputs, outputs, params)
                 else:
-                    print('plugin op: {},{}'.format(index,layerType))
+                    print('plugin op: {},{}'.format(outputs[0][0],layerType))
                     params = [] #node.scalar_args()
                     results = self.pluginOp[layerType](trt_network, inputs, outputs, params)
             except:

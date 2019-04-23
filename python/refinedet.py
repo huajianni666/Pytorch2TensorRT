@@ -62,7 +62,7 @@ def pre_process(img, resize_wh=[512, 512], rgb_means=[104,117,123], rgb_scale = 
 
 if __name__ == '__main__':
     net = Refinedet(Vehicle,RefineResnet18('448'))
-    checkpoint = torch.load("../modules/detection/refinedet_pytorch_dist/weights/refine_res_epoch_250_300.pth")
+    checkpoint = torch.load("refine_res_epoch_250_300_4_23.pth")
     load_state_dict = checkpoint['model']
     load_keys = sorted(list(load_state_dict.keys()))
     #print('load: {}'.format(load_keys))
