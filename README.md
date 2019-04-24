@@ -5,7 +5,7 @@
 ### 安装
 ```Shell
 git clone --recursive https://github.com/huajianni666/Pytorch2TensorRT.git && cd Pytorch2TensorRT
-wget http://p3gvzhggv.bkt.clouddn.com/Pytorch2Trt3rdparty.zip
+wget http://pq16f3soz.bkt.clouddn.com/Pytorch2Trt3rdparty.zip
 unzip Pytorch2Trt3rdparty.zip && rm Pytorch2Trt3rdparty.zip
 ```
 ### 编绎
