@@ -9,12 +9,13 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
-#include "NvCaffeParser.h"
 #include "NvInfer.h"
 using namespace std;
 
 void FinetuneLoc(int batchSize, int numPriorboxes, const float* arm_loc,
                  const float* priorbox_loc, float* loc);
+
+#if NV_TENSORRT_MAJOR >= 5
 
 class FinetuneLocPlugin : public nvinfer1::IPluginV2 {
  public:
@@ -134,5 +135,7 @@ class FinetuneLocPluginCreator : public nvinfer1::IPluginCreator {
   static std::vector<nvinfer1::PluginField> mPluginAttributes;
   std::string mNamespace;
 };
+
+#endif
 
 #endif  // SHADOW_FINETUNELOC_HPP

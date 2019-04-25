@@ -9,13 +9,14 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
-#include "NvCaffeParser.h"
 #include "NvInfer.h"
 using namespace std;
 
 void FilterBgConf(int batchSize, int numPriorboxes, int numClasses,
                   float objectness_score, const float* arm_conf,
                   const float* odm_conf, float* conf);
+
+#if NV_TENSORRT_MAJOR >= 5
 
 class FilterBgConfPlugin : public nvinfer1::IPluginV2 {
  public:
@@ -158,5 +159,7 @@ class FilterBgConfPluginCreator : public nvinfer1::IPluginCreator {
   static std::vector<nvinfer1::PluginField> mPluginAttributes;
   std::string mNamespace;
 };
+
+#endif
 
 #endif  // SHADOW_FILTERBGCONF_HPP

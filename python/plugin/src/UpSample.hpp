@@ -8,13 +8,14 @@
 #include <cstring>
 #include <stdexcept>
 #include <vector>
-#include "NvCaffeParser.h"
 #include "NvInfer.h"
 using namespace std;
 
 template <typename T>
 void Resize(const T* in_data, const vector<int>& in_shape, int type,
             const vector<int>& out_shape, T* out_data);
+
+#if NV_TENSORRT_MAJOR >= 5
 
 class UpSamplePlugin : public nvinfer1::IPluginV2 {
  public:
@@ -171,5 +172,7 @@ class UpSamplePluginCreator : public nvinfer1::IPluginCreator {
   static std::vector<nvinfer1::PluginField> mPluginAttributes;
   std::string mNamespace;
 };
+
+#endif
 
 #endif  // SHADOW_UPSAMPLE_HPP
