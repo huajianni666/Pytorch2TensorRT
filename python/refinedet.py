@@ -45,7 +45,7 @@ def draw(origimg, rectangles, boxNums):
                 cv2.rectangle(draw,(int(rectangles[i*7+3]*W),int(rectangles[i*7+4]*H)),(int(rectangles[i*7+5]*W),int(rectangles[i*7+6]*H)),(0,255,0),2)
     cv2.imwrite('result.jpg', draw)
 
-def pre_process(img, resize_wh=[512, 512], rgb_means=[104,117,123], rgb_scale = 0.017, swap=(2, 0, 1)):
+def pre_process(img, resize_wh=[512, 512], swap=(2, 0, 1)):
     interp_methods = [
         cv2.INTER_LINEAR, cv2.INTER_CUBIC, cv2.INTER_AREA,
         cv2.INTER_NEAREST, cv2.INTER_LANCZOS4
@@ -55,8 +55,6 @@ def pre_process(img, resize_wh=[512, 512], rgb_means=[104,117,123], rgb_scale = 
     img = cv2.resize(
         np.array(img), (resize_wh[0], resize_wh[1]),
         interpolation=interp_method).astype(np.float32)
-    img -= rgb_means
-    img *= rgb_scale
     img = img.transpose(swap)
     return img, img_info
 
@@ -105,12 +103,8 @@ if __name__ == '__main__':
     parser = PytorchParser(pluginOp)
     #generate priors and save    
     priors = getPriorLayer(len(Vehicle['STEPS']), Vehicle['FEATURE_MAPS'], Vehicle['SIZE'], Vehicle['STEPS'], Vehicle['MIN_SIZES'], Vehicle['MAX_SIZES'], Vehicle['ASPECT_RATIOS'], Vehicle['USE_MAX_SIZE'], Vehicle['CLIP'])
-    np.savetxt('prior.txt',priors.detach().numpy(),fmt='%f',newline=',\n',delimiter=',')    # 保存
-    #load prior from txt
-    #priors= np.loadtxt('prior.txt',delimiter=' ')
-    #priors = torch.from_numpy(priors)
     inputs = (inputs,priors)
-    input_names = ("data",'priors')
+    input_names = ("data","prior")
     with trt.Builder(TRT_LOGGER) as builder, builder.create_network() as trt_network:
         if type(inputs) == tuple:
             names = [str(i) for i in range(len(inputs))]
@@ -124,6 +118,6 @@ if __name__ == '__main__':
          
         engine = builder.build_cuda_engine(trt_network)
         save_engine(engine, "refinedet.engine")
-        # trt_outputs = inference(trt_network, engine, inputs)
-        # trt_outputs = trt_outputs[0].host
-        # draw(img,trt_outputs,int(trt_outputs.shape[0]/7))
+        trt_outputs = inference(trt_network, engine, inputs)
+        trt_outputs = trt_outputs[0].host
+        draw(img,trt_outputs,int(trt_outputs.shape[0]/7))

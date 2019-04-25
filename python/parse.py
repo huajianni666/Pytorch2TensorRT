@@ -690,6 +690,7 @@ class PytorchParser:
        
 
 def inference(network, engine, input_vars):
+    input_vars = [ input_vars[0]]
     inputs, outputs, bindings, stream = allocate_buffers(engine)
     with engine.create_execution_context() as context:
         for i, input_var in enumerate(input_vars):
