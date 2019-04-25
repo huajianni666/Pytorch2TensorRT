@@ -18,10 +18,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC")
 set(PYBIND11_CPP_STANDARD -std=c++11)
 
 set_ifndef(PYBIND11_DIR ../../3rdparty/pybind11/)
-set_ifndef(CUDA_VERSION 10.0)
+set_ifndef(CUDA_VERSION 9.0)
 set_ifndef(CUDA_ROOT /usr/local/cuda-${CUDA_VERSION})
 set_ifndef(CUDNN_ROOT ${CUDA_ROOT})
-set_ifndef(PYTHON_ROOT /home/atlab/Softwares/anaconda3/envs/trt)
+set_ifndef(PYTHON_ROOT ~/anaconda2/envs/TrtP4)
 set_ifndef(TRT_LIB_DIR /usr/local/lib)
 set_ifndef(TRT_INC_DIR /usr/local/include)
 
@@ -66,7 +66,7 @@ set_ifndef(PYTHON3_INC_DIR ${_PYTHON3_INC_DIR})
 # Add include directories
 include_directories(${TRT_INC_DIR} ${CUDA_INC_DIR} ${CUDNN_INC_DIR} ${PYBIND11_DIR}/include/)
 
-set(PYTHON_EXECUTABLE /home/atlab/Softwares/anaconda3/envs/trt/bin/python)
+# set(PYTHON_EXECUTABLE /home/atlab/Softwares/anaconda3/envs/trt/bin/python)
 # Add this so we can retrieve pybind11_add_module.
 add_subdirectory(${PYBIND11_DIR} ${CMAKE_BINARY_DIR}/pybind11)
 
