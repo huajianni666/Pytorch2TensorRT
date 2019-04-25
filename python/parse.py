@@ -634,11 +634,16 @@ class PytorchParser:
             if idx ==0:
                 assert var.dim() == 4,'wrong input dim'
                 tensor = network.add_input(name, trt.float32, var.shape[1:])
-                inputTensors.append(tensor)
+                mean = np.asarray([104, 117, 123], dtype=np.float32)
+                scale = np.asarray([0.017, 0.017, 0.017], dtype=np.float32)
+                layer = network.add_scale(tensor, trt.ScaleMode.CHANNEL, shift=-scale*mean, scale=scale)
+                inputTensors.append(layer.get_output(0))
                 idx += 1
             else:
-                tensor = network.add_input(name, trt.float32, var.shape[0:])
-                inputTensors.append(tensor)
+                var = var.detach().numpy()
+                layer = network.add_constant(trt.DimsCHW(var.size, 1, 1), var)
+                # tensor = network.add_input(name, trt.float32, var.shape[0:])
+                inputTensors.append(layer.get_output(0))
         return inputTensors
 
     def RefinedetParse(self, graph, params, trt_network, input_var, input_names, Vehicle):

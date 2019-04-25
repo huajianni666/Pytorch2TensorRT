@@ -52,38 +52,39 @@ class DetecOp:
         plugin = DetectionOutputPlugin(shareLocation, varianceEncodedInTarget, backgroundLabelId, num_classes,
                                                 top_k, keepTopK, conf_thresh, nms_thresh)
 
-        layer = network.add_plugin([loc, conf, prior], plugin)
-        layer.name = 'detectionoutput'
+        layer = network.add_plugin_v2([loc, conf, prior], plugin)
+        # layer.name = 'detectionoutput'
         return layer.get_output(0)
 
 upsamplename = 1
 class UpsampleOp:
     def __call__(self, network, inputs, outputs, params):
-        assert len(inputs) == 1
+        assert len(inputs) == 2
         assert type(inputs[0]) == trt.ITensor
-        plugin = UpSamplePlugin(2.0, 1)
-        layer = network.add_plugin_ext(inputs, plugin)
-        global upsamplename
-        layer.name = 'upsample'+ str(upsamplename)
-        upsamplename += 1
+        plugin = UpSamplePlugin('upsample', 2.0, 1)
+        inputs = [inputs[0]]
+        layer = network.add_plugin_v2(inputs, plugin)
+        # global upsamplename
+        # layer.name = 'upsample'+ str(upsamplename)
+        # upsamplename += 1
         return layer.get_output(0)
 
 class FilterBgConfOp:
     def __call__(self, network, inputs, outputs, params):
         assert len(inputs) == 2
         assert type(inputs[0]) == trt.ITensor and type(inputs[1]) == trt.ITensor
-        plugin = FilterBgConfPlugin(0.01)
-        layer = network.add_plugin_ext(inputs, plugin)
-        layer.name = 'filterbgconf'
+        plugin = FilterBgConfPlugin('filterbgconf', 0.01)
+        layer = network.add_plugin_v2(inputs, plugin)
+        # layer.name = 'filterbgconf'
         return layer.get_output(0)
 
 class FinetuneLocOp:
     def __call__(self, network, inputs, outputs, params):
         assert len(inputs) == 2
         assert type(inputs[0]) == trt.ITensor and type(inputs[1]) == trt.ITensor
-        plugin = FinetuneLocPlugin()
-        layer = network.add_plugin_ext(inputs, plugin)
-        layer.name = 'finetuneloc'
+        plugin = FinetuneLocPlugin('finetuneloc')
+        layer = network.add_plugin_v2(inputs, plugin)
+        # layer.name = 'finetuneloc'
         return layer.get_output(0)
 
 pluginOp = {"PriorBoxF":       PriorboxOp(),

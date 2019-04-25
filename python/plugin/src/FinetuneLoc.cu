@@ -1,5 +1,5 @@
-#include "FinetuneLoc.h"
-#include "Common.h"
+#include "FinetuneLoc.hpp"
+#include "common.hpp"
 
 __global__ void KernelFinetuneLoc(int batchSize, int numPriorboxes, const float *arm_loc, const float *priorbox_loc, float *loc)
 {

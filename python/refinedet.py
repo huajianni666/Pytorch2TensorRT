@@ -95,7 +95,7 @@ if __name__ == '__main__':
     if type(inputs) == tuple:
         traced_model = torch.jit.trace(*inputs)(net)
     else:
-        traced_model = torch.jit.trace(inputs)(net)
+        traced_model = torch.jit.trace(net,inputs)
     fwd = traced_model._get_method('forward')
     params = list(map(lambda x: x.detach().numpy(), fwd.params()))
     with torch.onnx.set_training(net, False):
@@ -124,6 +124,6 @@ if __name__ == '__main__':
          
         engine = builder.build_cuda_engine(trt_network)
         save_engine(engine, "refinedet.engine")
-        trt_outputs = inference(trt_network, engine, inputs)
-        trt_outputs = trt_outputs[0].host
-        draw(img,trt_outputs,int(trt_outputs.shape[0]/7))
+        # trt_outputs = inference(trt_network, engine, inputs)
+        # trt_outputs = trt_outputs[0].host
+        # draw(img,trt_outputs,int(trt_outputs.shape[0]/7))

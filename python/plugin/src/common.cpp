@@ -1,4 +1,4 @@
-#include "common.h"
+#include "common.hpp"
 
 // Helpers to move data to/from the GPU.
 nvinfer1::Weights copyToDevice(const void* hostData, int count)

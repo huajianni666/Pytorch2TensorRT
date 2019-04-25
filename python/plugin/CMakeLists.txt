@@ -18,10 +18,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC")
 set(PYBIND11_CPP_STANDARD -std=c++11)
 
 set_ifndef(PYBIND11_DIR ../../3rdparty/pybind11/)
-set_ifndef(CUDA_VERSION 9.0)
+set_ifndef(CUDA_VERSION 10.0)
 set_ifndef(CUDA_ROOT /usr/local/cuda-${CUDA_VERSION})
 set_ifndef(CUDNN_ROOT ${CUDA_ROOT})
-set_ifndef(PYTHON_ROOT ~/anaconda2/envs/trt5.0)
+set_ifndef(PYTHON_ROOT /home/atlab/Softwares/anaconda3/envs/trt)
 set_ifndef(TRT_LIB_DIR /usr/local/lib)
 set_ifndef(TRT_INC_DIR /usr/local/include)
 
@@ -66,6 +66,7 @@ set_ifndef(PYTHON3_INC_DIR ${_PYTHON3_INC_DIR})
 # Add include directories
 include_directories(${TRT_INC_DIR} ${CUDA_INC_DIR} ${CUDNN_INC_DIR} ${PYBIND11_DIR}/include/)
 
+set(PYTHON_EXECUTABLE /home/atlab/Softwares/anaconda3/envs/trt/bin/python)
 # Add this so we can retrieve pybind11_add_module.
 add_subdirectory(${PYBIND11_DIR} ${CMAKE_BINARY_DIR}/pybind11)
 
@@ -79,15 +80,15 @@ find_package(CUDA QUIET)
 include_directories(SYSTEM ${CUDA_TOOLKIT_INCLUDE})
 
 # Bindings library. The module name MUST MATCH the module name specified in the .cpp
-if(PYTHON3_INC_DIR AND NOT (${PYTHON3_INC_DIR} STREQUAL "None"))
-    cuda_add_library(${PY_MODULE_NAME}cu  SHARED ${SOURCE_CU_FILES})
+# if(PYTHON3_INC_DIR AND NOT (${PYTHON3_INC_DIR} STREQUAL "None"))
+    cuda_add_library(${PY_MODULE_NAME}cu  SHARED ${SOURCE_FILES} ${SOURCE_CU_FILES})
     #set_target_properties(${PY_MODULE_NAME} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
                         #PREFIX "${PYTHON_MODULE_PREFIX}"
                         #SUFFIX "${PYTHON_MODULE_EXTENSION}")
-    pybind11_add_module(${PY_MODULE_NAME} SHARED THIN_LTO ${SOURCE_FILES})
-    target_include_directories(${PY_MODULE_NAME} BEFORE PUBLIC ${PYTHON3_INC_DIR})
+    pybind11_add_module(${PY_MODULE_NAME} SHARED THIN_LTO ${CMAKE_SOURCE_DIR}/src/PluginFactory.cc)
+    # target_include_directories(${PY_MODULE_NAME} BEFORE PUBLIC ${PYTHON3_INC_DIR})
     target_link_libraries(${PY_MODULE_NAME} PRIVATE ${PY_MODULE_NAME}cu ${CUDNN_LIB} ${CUDA_LIB} ${CUBLAS_LIB} ${NVINFER_LIB} ${NVPARSERS_LIB} ${NVINFER_PLUGIN_LIB})
-endif()
+# endif()
 
 return()
 
