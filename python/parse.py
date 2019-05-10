@@ -634,7 +634,7 @@ class PytorchParser:
             if idx ==0:
                 assert var.dim() == 4,'wrong input dim'
                 tensor = network.add_input(name, trt.float32, var.shape[1:])
-                mean = np.asarray([104, 117, 123], dtype=np.float32)
+                mean = np.asarray([123, 117, 104], dtype=np.float32)
                 scale = np.asarray([0.017, 0.017, 0.017], dtype=np.float32)
                 layer = network.add_scale(tensor, trt.ScaleMode.CHANNEL, shift=-scale*mean, scale=scale)
                 inputTensors.append(layer.get_output(0))

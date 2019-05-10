@@ -37,6 +37,7 @@ def draw(origimg, rectangles, boxNums):
         if rectangles[i * 7 + 1] == -1:
             break
         else:
+            print("C:{},conf:{},{},{},{},{}\n".format(rectangles[i * 7 + 1],rectangles[i * 7 + 2],rectangles[i * 7 + 3],rectangles[i * 7 + 4],rectangles[i * 7 + 5],rectangles[i * 7 + 6]))
             if rectangles[i * 7 + 1] == 1:
                 cv2.rectangle(draw,(int(rectangles[i*7+3]*W),int(rectangles[i*7+4]*H)),(int(rectangles[i*7+5]*W),int(rectangles[i*7+6]*H)),(255,0,0),2)
             if rectangles[i * 7 + 1] == 2:
@@ -60,7 +61,7 @@ def pre_process(img, resize_wh=[512, 512], swap=(2, 0, 1)):
 
 if __name__ == '__main__':
     net = Refinedet(Vehicle,RefineResnet18('448'))
-    checkpoint = torch.load("refine_res_epoch_250_300_4_23.pth")
+    checkpoint = torch.load("nomotor_refine_res18_ap_91.68.pth")
     load_state_dict = checkpoint['model']
     load_keys = sorted(list(load_state_dict.keys()))
     #print('load: {}'.format(load_keys))
